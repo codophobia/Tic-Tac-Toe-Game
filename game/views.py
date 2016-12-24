@@ -6,18 +6,6 @@ from random import randint
 from django.views.decorators.csrf import csrf_exempt
 xpos = -1
 ypos = -1
-start = 0
-a = [[0 for x in range(3)] for x in range(3)]
-temp = {}
-temp[0,0] = 1
-temp[0,1] = 2
-temp[0,2] = 3
-temp[1,0] = 4
-temp[1,1] = 5
-temp[1,2] = 6
-temp[2,0] = 7
-temp[2,1] = 8
-temp[2,2] = 9
 def score(b,comp,p,turn): #checks if a player has won or not
 	flag = 0
 	for i in range(3):
@@ -99,53 +87,25 @@ def tictac(b,comp,p,turn,g): #min-max algorithm for tic-tac toe
 		return mn
 @csrf_exempt
 def index(request): #when the user submits his choice
-	global a
 	if request.method == 'POST':
-		pos = int(request.POST['pos'])
-		x = -1
-		y = -1
-		if(pos == 1):
-			x = 0
-			y = 0
-		elif(pos == 2):
-			x = 0
-			y = 1
-		elif(pos == 3):
-			x = 0
-			y = 2
-		elif(pos == 4):
-			x = 1
-			y = 0
-		elif(pos == 5):
-			x = 1
-			y = 1
-		elif(pos == 6):
-			x = 1
-			y = 2
-		elif(pos == 7):
-			x = 2
-			y = 0
-		elif(pos == 8):
-			x = 2
-			y = 1
-		elif(pos == 9):
-			x = 2
-			y = 2
-		a[x][y] = 2
-		c = a
-		s = score(c,1,2,2)
+		board = request.POST.getlist('board[]')
+		a = [[0 for x in range(3)] for x in range(3)]
+		for i in range(3):
+			for j in range(3):
+				a[i][j] = int(board[3*i+j])
+		s = score(a,1,2,2)
 		if(s == -10):
 			return JsonResponse({'val':0,'res':1,'winner':'player'})
-		elif(checkdraw(c) == 1):
+		elif(checkdraw(a) == 1):
 			return JsonResponse({'val':0,'res':1,'winner':'draw'})
-		tictac(c,1,2,1,0)
+		tictac(a,1,2,1,0)
 		a[xpos][ypos] = 1
 		s = score(a,1,2,1)
 		if(s == 10):
-			return JsonResponse({'val':temp[xpos,ypos],'res':1,'winner':'comp'})
+			return JsonResponse({'val':xpos*3+ypos,'res':1,'winner':'comp'})
 		elif(checkdraw(a) == 1):
-			return JsonResponse({'val':temp[xpos,ypos],'res':1,'winner':'draw'})
-		return JsonResponse({'val':temp[xpos,ypos],'res':0,'winner':'none'})
+			return JsonResponse({'val':xpos*3+ypos,'res':1,'winner':'draw'})
+		return JsonResponse({'val':xpos*3+ypos,'res':0,'winner':'none'})
 	else:
 		return JsonResponse({'val':"error"})
 
@@ -154,18 +114,3 @@ def home(request): #displaying the home page
 	context = {}
 	return render(request,"game/home.html",context)
 
-@csrf_exempt
-def chance(request): #selecting who plays first
-	global start
-	if request.method == 'POST':
-		start = int(request.POST['chance'])
-		for i in range(3):
-				for j in range(3):
-					a[i][j] = 0
-		if(start == 1):
-			x = randint(0,2)
-			y = randint(0,2)
-			a[x][y] = 1
-			return JsonResponse({'val':temp[x,y]})
-		else:
-			return JsonResponse({'val':"start"})

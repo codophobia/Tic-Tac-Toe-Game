@@ -21,5 +21,4 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^handler/',views.index,name='index'),
     url(r'^$',views.home,name='home'),
-    url(r'^chance/',views.chance,name='chance'),
 ]
