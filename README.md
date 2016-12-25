@@ -1,6 +1,8 @@
 # Tic-Tac-Toe-Game
 A two player tic-tac-toe game made using django. It uses minimax algorithm.
 
+You can see the webapp here:<a href = "https://tic-tac-toe-game-django.herokuapp.com/">tic-tac-toe-game</a>
+
 Requirements:
 <ol>
 <li>Python 2.7 </li>
